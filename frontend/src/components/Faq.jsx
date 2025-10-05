@@ -12,7 +12,7 @@ const faqs = [
 
 export default function FAQ() {
   return (
-    <section className="relative bg-gray-900 py-20 px-6 lg:px-32 overflow-hidden flex flex-col items-center">
+    <section className="relative bg-gray-900 py-20 px-6 lg:px-32 overflow-hidden flex flex-col items-center" id="faq">
       {/* Centered Background Blobs */}
       <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 rounded-full opacity-30 blur-3xl animate-blob -translate-x-1/2 -translate-y-1/2"></div>
       <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-gradient-to-tr from-purple-500 via-indigo-500 to-blue-500 rounded-full opacity-30 blur-3xl animate-blob animation-delay-2000 -translate-x-1/2 -translate-y-1/2"></div>

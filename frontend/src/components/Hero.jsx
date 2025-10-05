@@ -1,21 +1,38 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Dialog, DialogPanel } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
+import { auth } from '../firebase'
+import { onAuthStateChanged, signOut } from 'firebase/auth'
 
 const navigation = [
   { name: 'Home', href: '#' },
-  { name: 'Features', href: '#' },
-  { name: 'Generate Script', href: '#' },
-  { name: 'About', href: '#' },
+  { name: 'Features', href: '#features' },
+  { name: 'Generate Script', href: '/scriptgenerate' },
+  { name: 'FAQ', href: '#faq' },
 ]
 
 export default function Hero() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [user, setUser] = useState(null)
+  const [dropdownOpen, setDropdownOpen] = useState(false)
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser)
+    })
+    return () => unsubscribe()
+  }, [])
+
+  const handleLogout = async () => {
+    await signOut(auth)
+    setDropdownOpen(false)
+  }
 
   return (
     <div className="bg-gray-900">
+      {/* Header & Navbar */}
       <header className="absolute inset-x-0 top-0 z-50">
         <nav aria-label="Global" className="flex items-center justify-between p-6 lg:px-8 relative">
           <div className="flex lg:flex-1">
@@ -50,17 +67,41 @@ export default function Hero() {
                 className="text-sm/6 font-semibold text-white relative group"
               >
                 {item.name}
-                {/* Animated underline */}
                 <span className="absolute left-0 -bottom-1 h-[2px] w-0 bg-indigo-500 transition-all group-hover:w-full"></span>
               </a>
             ))}
           </div>
 
-          <div className="hidden lg:flex lg:flex-1 lg:justify-end">
-            <a href="#" className="text-sm/6 font-semibold text-white relative group">
-              Log in <span aria-hidden="true">&rarr;</span>
-              <span className="absolute left-0 -bottom-1 h-[2px] w-0 bg-indigo-500 transition-all group-hover:w-full"></span>
-            </a>
+          {/* Login/User Avatar */}
+          <div className="hidden lg:flex lg:flex-1 lg:justify-end relative">
+            {user ? (
+              <div className="relative">
+                <img
+                  src={user.photoURL}
+                  alt="User"
+                  className="h-10 w-10 rounded-full cursor-pointer"
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                />
+                {dropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-32 bg-gray-800 rounded-lg shadow-lg py-2 text-center">
+                    <button
+                      onClick={handleLogout}
+                      className=" cursor-pointer w-full text-white py-2 hover:bg-gray-700 rounded"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <a
+                href="/login"
+                className="text-sm/6 font-semibold text-white relative group"
+              >
+                Log in <span aria-hidden="true">&rarr;</span>
+                <span className="absolute left-0 -bottom-1 h-[2px] w-0 bg-indigo-500 transition-all group-hover:w-full"></span>
+              </a>
+            )}
           </div>
         </nav>
 
@@ -99,13 +140,22 @@ export default function Hero() {
                     </a>
                   ))}
                 </div>
-                <div className="py-6">
-                  <a
-                    href="#"
-                    className="-mx-3 block rounded-lg px-3 py-2.5 text-base/7 font-semibold text-white hover:bg-white/5"
-                  >
-                    Log in
-                  </a>
+                <div className="py-6 cursor-pointer">
+                  {user ? (
+                    <button
+                      onClick={handleLogout}
+                      className="cursor-pointer -mx-3 block w-full rounded-lg px-3 py-2.5 text-base/7 font-semibold text-white hover:bg-white/5 text-left"
+                    >
+                      Logout
+                    </button>
+                  ) : (
+                    <a
+                      href="/login"
+                      className="-mx-3 block rounded-lg px-3 py-2.5 text-base/7 font-semibold text-white hover:bg-white/5"
+                    >
+                      Log in
+                    </a>
+                  )}
                 </div>
               </div>
             </div>
@@ -113,7 +163,7 @@ export default function Hero() {
         </Dialog>
       </header>
 
-      {/* Hero Section (unchanged) */}
+      {/* Hero Section (kept fully as before) */}
       <div className="relative isolate px-6 pt-14 lg:px-8">
         {/* Background gradient shapes */}
         <div
