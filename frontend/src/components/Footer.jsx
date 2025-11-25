@@ -19,7 +19,7 @@ export default function Footer() {
         <div>
           <h3 className="text-lg font-semibold text-white mb-4">Product</h3>
           <ul className="space-y-2">
-            <li><a href="#" className="hover:text-indigo-400 transition">Features</a></li>
+            <li><a href="#features" className="hover:text-indigo-400 transition">Features</a></li>
             <li><a href="#" className="hover:text-indigo-400 transition">Pricing</a></li>
             <li><a href="#" className="hover:text-indigo-400 transition">Marketplace</a></li>
           </ul>
