@@ -1,3 +1,4 @@
+'use client'
 import React, { useState, useEffect } from "react";
 
 const regions = [
@@ -24,40 +25,43 @@ export default function LambdaForm({ onChange }) {
   const validate = (data = formData) => {
     const err = {};
 
-    // Function Name
-    if (!/^[a-zA-Z0-9-_]{1,64}$/.test(data.functionName)) {
-      err.functionName =
-        "Function name must be 1–64 chars, only letters, numbers, hyphens, underscores.";
+    // ✅ Mandatory: Function Name
+    if (!data.functionName) {
+      err.functionName = "Function name is required.";
+    } else if (!/^[a-zA-Z0-9-_]{1,64}$/.test(data.functionName)) {
+      err.functionName = "Invalid format (1–64 chars, letters, numbers, hyphens, underscores).";
     }
 
-    // Runtime
+    // ✅ Mandatory: Runtime
     if (!runtimes.includes(data.runtime)) {
       err.runtime = "Invalid runtime selected.";
     }
 
-    // Handler
-    if (!/^[\w.-]+\.?[\w.-]*$/.test(data.handler)) {
+    // ✅ Mandatory: Handler
+    if (!data.handler) {
+      err.handler = "Handler is required.";
+    } else if (!/^[\w.-]+\.?[\w.-]*$/.test(data.handler)) {
       err.handler = "Invalid handler format.";
     }
 
-    // Role ARN
-    if (
-      !/^arn:aws:iam::\d{12}:role\/[a-zA-Z0-9+=,.@-_\/]+$/.test(data.roleArn)
-    ) {
-      err.roleArn = "Enter a valid IAM Role ARN.";
+    // ✅ Mandatory: Role ARN
+    if (!data.roleArn) {
+      err.roleArn = "Role ARN is required.";
+    } else if (!/^arn:aws:iam::\d{12}:role\/[a-zA-Z0-9+=,.@-_\/]+$/.test(data.roleArn)) {
+      err.roleArn = "Invalid IAM Role ARN format.";
     }
 
-    // Memory Size
+    // ✅ Memory Size
     if (data.memorySize < 128 || data.memorySize > 10240) {
       err.memorySize = "Memory size must be between 128 and 10240 MB.";
     }
 
-    // Timeout
+    // ✅ Timeout
     if (data.timeout <= 0 || data.timeout > 900) {
       err.timeout = "Timeout must be between 1 and 900 seconds.";
     }
 
-    // Region
+    // ✅ Mandatory: Region
     if (!regions.includes(data.region)) {
       err.region = "Invalid AWS region.";
     }
@@ -66,7 +70,6 @@ export default function LambdaForm({ onChange }) {
     return Object.keys(err).length === 0;
   };
 
-  // Update parent whenever form is valid
   useEffect(() => {
     if (validate(formData)) onChange(formData);
     else onChange(null);
@@ -82,13 +85,13 @@ export default function LambdaForm({ onChange }) {
 
   return (
     <div className="max-w-lg mx-auto bg-white p-6 rounded-xl shadow-md space-y-4">
-      <h2 className="text-2xl font-semibold mb-4 text-gray-800">
-        🛠 Lambda Configuration
-      </h2>
+      <h2 className="text-2xl font-semibold mb-4 text-gray-800">🛠 Lambda Configuration</h2>
 
       {/* Function Name */}
       <div>
-        <label className="block font-medium">Function Name</label>
+        <label className="block font-medium">
+          Function Name <span className="text-red-500">*</span>
+        </label>
         <input
           type="text"
           name="functionName"
@@ -97,14 +100,14 @@ export default function LambdaForm({ onChange }) {
           placeholder="my-lambda-fn"
           className="border p-2 rounded w-full"
         />
-        {errors.functionName && (
-          <p className="text-red-500 text-sm">{errors.functionName}</p>
-        )}
+        {errors.functionName && <p className="text-red-500 text-sm">{errors.functionName}</p>}
       </div>
 
       {/* Runtime */}
       <div>
-        <label className="block font-medium">Runtime</label>
+        <label className="block font-medium">
+          Runtime <span className="text-red-500">*</span>
+        </label>
         <select
           name="runtime"
           value={formData.runtime}
@@ -115,14 +118,14 @@ export default function LambdaForm({ onChange }) {
             <option key={r} value={r}>{r}</option>
           ))}
         </select>
-        {errors.runtime && (
-          <p className="text-red-500 text-sm">{errors.runtime}</p>
-        )}
+        {errors.runtime && <p className="text-red-500 text-sm">{errors.runtime}</p>}
       </div>
 
       {/* Handler */}
       <div>
-        <label className="block font-medium">Handler</label>
+        <label className="block font-medium">
+          Handler <span className="text-red-500">*</span>
+        </label>
         <input
           type="text"
           name="handler"
@@ -131,14 +134,14 @@ export default function LambdaForm({ onChange }) {
           placeholder="index.handler"
           className="border p-2 rounded w-full"
         />
-        {errors.handler && (
-          <p className="text-red-500 text-sm">{errors.handler}</p>
-        )}
+        {errors.handler && <p className="text-red-500 text-sm">{errors.handler}</p>}
       </div>
 
       {/* Role ARN */}
       <div>
-        <label className="block font-medium">Role ARN</label>
+        <label className="block font-medium">
+          Role ARN <span className="text-red-500">*</span>
+        </label>
         <input
           type="text"
           name="roleArn"
@@ -147,9 +150,7 @@ export default function LambdaForm({ onChange }) {
           placeholder="arn:aws:iam::123456789012:role/MyLambdaRole"
           className="border p-2 rounded w-full"
         />
-        {errors.roleArn && (
-          <p className="text-red-500 text-sm">{errors.roleArn}</p>
-        )}
+        {errors.roleArn && <p className="text-red-500 text-sm">{errors.roleArn}</p>}
       </div>
 
       {/* Memory Size */}
@@ -165,9 +166,7 @@ export default function LambdaForm({ onChange }) {
           step="64"
           className="border p-2 rounded w-full"
         />
-        {errors.memorySize && (
-          <p className="text-red-500 text-sm">{errors.memorySize}</p>
-        )}
+        {errors.memorySize && <p className="text-red-500 text-sm">{errors.memorySize}</p>}
       </div>
 
       {/* Timeout */}
@@ -182,14 +181,14 @@ export default function LambdaForm({ onChange }) {
           max="900"
           className="border p-2 rounded w-full"
         />
-        {errors.timeout && (
-          <p className="text-red-500 text-sm">{errors.timeout}</p>
-        )}
+        {errors.timeout && <p className="text-red-500 text-sm">{errors.timeout}</p>}
       </div>
 
       {/* Region */}
       <div>
-        <label className="block font-medium">Region</label>
+        <label className="block font-medium">
+          Region <span className="text-red-500">*</span>
+        </label>
         <select
           name="region"
           value={formData.region}
@@ -200,9 +199,7 @@ export default function LambdaForm({ onChange }) {
             <option key={r} value={r}>{r}</option>
           ))}
         </select>
-        {errors.region && (
-          <p className="text-red-500 text-sm">{errors.region}</p>
-        )}
+        {errors.region && <p className="text-red-500 text-sm">{errors.region}</p>}
       </div>
     </div>
   );
